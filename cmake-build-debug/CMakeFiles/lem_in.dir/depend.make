@@ -207,3 +207,7 @@ CMakeFiles/lem_in.dir/main.c.o: ../lem-in.h
 CMakeFiles/lem_in.dir/main.c.o: ../libft/includes/libft.h
 CMakeFiles/lem_in.dir/main.c.o: ../main.c
 
+CMakeFiles/lem_in.dir/validation.c.o: ../lem-in.h
+CMakeFiles/lem_in.dir/validation.c.o: ../libft/includes/libft.h
+CMakeFiles/lem_in.dir/validation.c.o: ../validation.c
+

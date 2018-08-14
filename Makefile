@@ -11,7 +11,7 @@
 #******************************************************************************#
 
 NAME = lem-in
-SRCS = main.c
+SRCS = main.c validation.c
 FLAGS = -Wall -Werror -Wextra
 
 all: $(NAME) 

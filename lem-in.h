@@ -33,8 +33,17 @@ typedef struct			s_lemin
 	int					start;
 	int					end;
 	int					count_r;
+	int					l;
 	int					**links;
 	struct s_hashmap	*rooms;
 }						t_lemin;
+
+void					read_map(t_lemin *ptr);
+void					error(int e, char *line);
+int						is_valid(char *line, int bool);
+int						ibyname(t_lemin *ptr, char *name);
+void					create_elem(t_lemin *ptr, t_hashmap *tmp, char *line);
+void					write_elem(t_lemin *ptr, char *line);
+void					write_link(t_lemin *ptr, char *line);
 
 #endif

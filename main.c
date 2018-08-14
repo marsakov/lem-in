@@ -12,50 +12,18 @@
 
 #include "lem-in.h"
 
-int		is_valid(char *line, int bool)
-{
-	char *s;
-
-	if (!bool)
-	{
-		while (*line)
-			if (!ft_isdigit(*line++))
-				return (0);
-	}
-	else
-	{
-		if (!(s = ft_strchr(line, ' ')) || !*(++s))
-			return (0);
-		while (*s && *s != ' ')
-			if (!ft_isdigit(*s++))
-				return (0);
-		if (!*(++s))
-			return (0);
-		while (*s && *s != ' ')
-			if (!ft_isdigit(*s++))
-				return (0);
-		if (*s)
-			return (0);
-	}
-	return (1);
-}
-
-int		ibyname(t_lemin *ptr, char *name)
+char	*namebyi(t_lemin *ptr, int i)
 {
 	t_hashmap	*tmp;
-	int			c;
 
-	c = 0;
-	while (name[c] && name[c] != '-' && name[c] != ' ')
-		c++;
 	tmp = ptr->rooms;
 	while (tmp)
 	{
-		if (!ft_strncmp(tmp->name, name, c))
-			return (tmp->i);
+		if (tmp->i == i)
+			return (tmp->name);
 		tmp = tmp->next;
 	}
-	return (-1);
+	return (NULL);
 }
 
 void	error(int e, char *line)
@@ -70,85 +38,12 @@ void	error(int e, char *line)
 	else if (e == 3)
 		ft_printf("%s : '%s']\n", "INVALID LINK", line);
 	else if (e == 4)
-		ft_printf("%s\n", "MISSING '##start' or '##end']");
+		ft_printf("%s]\n", "MISSING '##start' or '##end'");
 	else if (e == 5)
 		ft_printf("%s : '%s']\n", "ROOM HAS ALREADY EXIST", line);
+	else if (e == 6)
+		ft_printf("%s]\n", "NO LINKS");
 	exit(1);
-}
-
-void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
-{
-	int i;
-
-	i = 0;
-	while (line[i] && line[i] != ' ')
-		i++;
-	tmp->name = ft_memalloc(sizeof(char) * (i + 1));
-	if (ibyname(ptr, line) != -1)
-		error(5, line);
-	tmp->name = ft_strncpy(tmp->name, line, i);
-	tmp->x = ft_atoi(ft_strchr(line, ' ') + 1);
-	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
-	tmp->next = NULL;
-}
-
-void	write_elem(t_lemin *ptr, char *line)
-{
-	int			i;
-	t_hashmap	*tmp;
-
-	i = 0;
-	if (!is_valid(line, 1))
-		error(2, line);
-	ft_printf("%s\n", line);
-	tmp = ptr->rooms;
-	while (i++ < ptr->count_r && tmp->next)
-		tmp = tmp->next;
-	if (!(i = 0) && !ptr->count_r)
-	{
-		if (!(tmp = malloc(sizeof(t_hashmap))))
-			error(0, NULL);
-		ptr->rooms = tmp;
-	}
-	else
-	{
-		if (!(tmp->next = malloc(sizeof(t_hashmap))))
-			error(0, NULL);
-		tmp = tmp->next;
-	}
-	create_elem(ptr, tmp, line);
-	tmp->i = ptr->count_r;
-	ptr->count_r++;
-}
-
-void	write_link(t_lemin *ptr, char *line)
-{
-	int i;
-
-	i = 0;
-	if (ptr->start == -1 || ptr->end == -1)
-		error(4, NULL);
-	ptr->links = malloc(sizeof(int*) * ptr->count_r);
-	while (i < ptr->count_r)
-		ptr->links[i++] = (int*)ft_memalloc(sizeof(int) * ptr->count_r);
-	if (ibyname(ptr, line) == -1 || ibyname(ptr, ft_strchr(line, '-') + 1) == -1)
-		error(3, line);
-	ptr->links[ibyname(ptr, line)][ibyname(ptr, ft_strchr(line, '-') + 1)] = 1;
-	ptr->links[ibyname(ptr, ft_strchr(line, '-') + 1)][ibyname(ptr, line)] = 1;
-	ft_printf("%s\n", line);
-	ft_strdel(&line);
-	while (GNL(0, &line) > 0)
-	{
-		if (ft_strchr(line, '-') && !ft_strchr(line, '#'))
-		{
-			if (ibyname(ptr, line) == -1 || ibyname(ptr, ft_strchr(line, '-') + 1) == -1)
-				error(3, line);
-			ptr->links[ibyname(ptr, line)][ibyname(ptr, ft_strchr(line, '-') + 1)] = 1;
-			ptr->links[ibyname(ptr, ft_strchr(line, '-') + 1)][ibyname(ptr, line)] = 1;
-		}
-		ft_printf("%s\n", line);
-		ft_strdel(&line);
-	}
 }
 
 void	read_map(t_lemin *ptr)
@@ -172,7 +67,7 @@ void	read_map(t_lemin *ptr)
 			}
 			write_elem(ptr, line);
 		}
-		else if (ft_strchr(line, '-') && !ft_strchr(line, '#'))
+		else if (ft_strchr(line, '-') && !ft_strchr(line, '#') && ++ptr->l)
 			write_link(ptr, line);
 		else if (!ft_strchr(line, '#'))
 			write_elem(ptr, line);
@@ -181,7 +76,37 @@ void	read_map(t_lemin *ptr)
 		if (line && *line && !(ft_strchr(line, '-') && !ft_strchr(line, '#')))
 			ft_strdel(&line);
 	}
-	ft_printf("END WRITTNG\n");
+	ft_printf(BLUE "END WRITTNG\n" NC);
+}
+
+int		check_link(int i, int j, t_lemin *ptr)
+{
+	if (ptr->links[i][j] == 0)
+		return (0);
+	ft_printf("%s-", namebyi(ptr, i));
+	ptr->links[i][j] = 0;
+	ptr->links[j][i] = 0;
+	if (i == ptr->end)
+		ft_printf("END\n");
+	// if (ptr->start + 1 < ptr->count_r)
+	// 	check_link(ptr->start, ptr->start + 1, ptr);
+	// if (ptr->start - 1 < ptr->count_r)
+	// 	check_link(ptr->start, ptr->start - 1, ptr);
+	return (1);
+}
+
+int		find_solutions(t_lemin *ptr)
+{
+	int			i;
+	// t_hashmap	*ways;
+
+	i = 1;
+	while (ptr->start + i < ptr->count_r)
+		check_link(ptr->start, ptr->start + i++, ptr);
+	// i = 1;
+	// while (ptr->start - i < ptr->count_r)
+	// 	check_link(ptr->start, ptr->start - i++, ptr);
+	return (1);
 }
 
 int		main(void)
@@ -191,6 +116,7 @@ int		main(void)
 
 	if (!(ptr = malloc(sizeof(t_lemin))))
 		return (0);
+	ptr->l = 0;
 	ptr->count_r = 0;
 	ptr->start = -1;
 	ptr->end = -1;
@@ -198,15 +124,19 @@ int		main(void)
 		ft_strdel(&line);
 	if (!line || !is_valid(line, 0) || !ptr->ants)
 		error(1, line);
+	ft_printf("%s\n", line);
 	ft_strdel(&line);
-	ft_printf("ants = %d\n", ptr->ants);
+	ft_printf(BLUE "ants = %d\n" NC, ptr->ants);
 	read_map(ptr);
+	if (ptr->l == 0)
+		error(6, NULL);
 	for (int j = 0; j < ptr->count_r; j++)
 	{
 		for (int k = 0; k < ptr->count_r; k++)
 			ft_printf("%d ", ptr->links[j][k]);
 		ft_printf("\n");
 	}
+	find_solutions(ptr);
 	// while (1);
 	return (0);
 }

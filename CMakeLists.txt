@@ -80,4 +80,5 @@ add_executable(lem_in
         libft/print_unicode.c
         libft/prints.c
         lem-in.h
-        main.c)
+        main.c
+        validation.c)
