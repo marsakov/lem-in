@@ -311,6 +311,9 @@
 		<Unit filename="/Users/msakovyc/lem-in/main.c">
 			<Option target="lem_in"/>
 		</Unit>
+		<Unit filename="/Users/msakovyc/lem-in/map.txt">
+			<Option target="lem_in"/>
+		</Unit>
 		<Unit filename="/Users/msakovyc/lem-in/validation.c">
 			<Option target="lem_in"/>
 		</Unit>

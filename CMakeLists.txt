@@ -81,4 +81,5 @@ add_executable(lem_in
         libft/prints.c
         lem-in.h
         main.c
+        map.txt
         validation.c)
