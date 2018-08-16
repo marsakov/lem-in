@@ -27,6 +27,13 @@ typedef struct			s_hashmap
 	struct s_hashmap	*next;
 }						t_hashmap;
 
+// typedef					s_ways
+// {
+// 	int					i;
+// 	struct s_hashmap	*way;
+// 	struct s_hashmap	*next;
+// }						t_ways;
+
 typedef struct			s_lemin
 {
 	int					ants;
@@ -36,6 +43,8 @@ typedef struct			s_lemin
 	int					l;
 	int					**links;
 	struct s_hashmap	*rooms;
+	int					ways;
+	// int					**ways;
 }						t_lemin;
 
 void					read_map(t_lemin *ptr);

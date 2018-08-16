@@ -59,7 +59,6 @@ void	read_map(t_lemin *ptr)
 			else
 				ptr->end = ptr->count_r;
 			ft_printf("%s\n", line);
-			ft_printf("start = %d   end = %d\n", ptr->start, ptr->end);
 			ft_strdel(&line);
 			while (GNL(0, &line) > 0 && ft_strchr(line, '#'))
 			{
@@ -85,11 +84,11 @@ int		check_link(int n, int k, t_lemin *ptr)
 	if (n == ptr->end)
 	{
 		ft_printf("%s\n", namebyi(ptr, n));
-		ft_printf("END\n");
-		return (0);
+		return (1);
 	}
 	if (ptr->links[n][k] == 0)
 		return (0);
+
 	ft_printf("%s -> ", namebyi(ptr, n));
 	ptr->links[n][k] = 0;
 	ptr->links[k][n] = 0;
@@ -99,16 +98,16 @@ int		check_link(int n, int k, t_lemin *ptr)
 	return (1);
 }
 
-int		find_solutions(t_lemin *ptr, int size)
+int		find_solutions(t_lemin *ptr)
 {
 	int			i;
-	t_hashmap	*ways[size];
 
 	i = 0;
-	ways[0] = ptr->rooms;
+	ptr->ways = 0;
 	while (i < ptr->count_r)
 		if (check_link(ptr->start, i++, ptr))
-			ft_printf("ok\n");
+			ptr->ways++;
+	ft_printf("solutions = %d\n", ptr->ways);
 	return (1);
 }
 
@@ -130,7 +129,6 @@ int		main(void)
 		error(1, line);
 	ft_printf("%s\n", line);
 	ft_strdel(&line);
-	ft_printf(BLUE "ants = %d\n" NC, ptr->ants);
 	read_map(ptr);
 	if (ptr->l == 0)
 		error(6, NULL);
@@ -140,13 +138,7 @@ int		main(void)
 			ft_printf("%d ", ptr->links[j][k]);
 		ft_printf("\n");
 	}
-	int i = 0;
-	int size = 0;
-	while (i < ptr->count_r)
-		if (ptr->links[ptr->start][i++] == 1)
-			size++;
-	ft_printf("size = %d\n", size);
-	find_solutions(ptr, size);
+	find_solutions(ptr);
 	// while (1);
 	return (0);
 }
