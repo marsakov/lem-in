@@ -43,8 +43,8 @@ typedef struct			s_lemin
 	int					l;
 	int					**links;
 	struct s_hashmap	*rooms;
-	int					ways;
-	// int					**ways;
+	// int					ways;
+	int					**ways;
 }						t_lemin;
 
 void					read_map(t_lemin *ptr);

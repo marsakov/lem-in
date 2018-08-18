@@ -79,34 +79,38 @@ void	read_map(t_lemin *ptr)
 	ft_printf(BLUE "END WRITTNG\n" NC);
 }
 
-int		check_link(int n, int k, t_lemin *ptr)
+int		check_link(int n, int k, t_lemin *ptr, int m)
 {
 	if (n == ptr->end)
 	{
 		ft_printf("%s\n", namebyi(ptr, n));
 		return (1);
 	}
-	if (ptr->links[n][k] == 0)
+	if (ptr->links[n][k] != 1)
 		return (0);
 
 	ft_printf("%s -> ", namebyi(ptr, n));
-	ptr->links[n][k] = 0;
+	ptr->links[n][k] = m;
 	ptr->links[k][n] = 0;
 	int i = 0;
 	while (i < ptr->count_r)
-		check_link(k, i++, ptr);
+		check_link(k, i++, ptr, m + 1);
 	return (1);
 }
 
 int		find_solutions(t_lemin *ptr)
 {
-	int			i;
+	int	i;
 
 	i = 0;
 	ptr->ways = 0;
 	while (i < ptr->count_r)
-		if (check_link(ptr->start, i++, ptr))
-			ptr->ways++;
+	{
+		if (i != ptr->end)
+			if (check_link(ptr->start, i, ptr, 2))
+				ptr->ways++;
+		i++;
+	}
 	ft_printf("solutions = %d\n", ptr->ways);
 	return (1);
 }
@@ -116,7 +120,6 @@ int		main(void)
 	t_lemin	*ptr;
 	char	*line;
 
-	// int fd = open("~/lem-in/map.txt", O_RDONLY);
 	if (!(ptr = malloc(sizeof(t_lemin))))
 		return (0);
 	ptr->l = 0;
@@ -138,7 +141,15 @@ int		main(void)
 			ft_printf("%d ", ptr->links[j][k]);
 		ft_printf("\n");
 	}
+	for (int i = 0; i < ptr->count_r; i++)
+		ptr->links[i][ptr->start] = 0;
 	find_solutions(ptr);
+	for (int j = 0; j < ptr->count_r; j++)
+	{
+		for (int k = 0; k < ptr->count_r; k++)
+			ft_printf("%d ", ptr->links[j][k]);
+		ft_printf("\n");
+	}
 	// while (1);
 	return (0);
 }
