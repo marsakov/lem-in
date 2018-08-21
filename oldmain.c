@@ -81,6 +81,101 @@ void	read_map(t_lemin *ptr)
 	ft_printf(BLUE "END WRITTNG\n" NC);
 }
 
+void	mem_solv(int k, t_lemin *ptr, int m, t_ways *w)
+{
+	t_hashmap *tmp;
+	t_hashmap *elem;
+
+	tmp = w->way;
+	elem = elembyi(ptr, k);
+	if (m == 1)
+	{
+		tmp->i = m;
+		tmp->name = ft_strdup(elem->name);
+		tmp->x = elem->x;
+		tmp->y = elem->y;
+		tmp->next = NULL;
+	}
+	else
+	{
+		tmp->next = malloc(sizeof(t_hashmap));
+		tmp->next->i = m;
+		tmp->next->name = ft_strdup(elem->name);
+		tmp->next->x = elem->x;
+		tmp->next->y = elem->y;
+		tmp->next->next = NULL;
+		tmp = tmp->next;
+	}
+}
+
+void	check_link(int k, t_lemin *ptr, int m, t_ways *w)
+{
+	if (k == ptr->end)
+		return ;
+	int i = 0;
+	while (i < ptr->count_r)
+	{
+		if (ptr->links[k][i] == 1)
+		{
+			ptr->links[k][i] = m;
+			ptr->links[i][k] = m;
+			mem_solv(i, ptr, m - 1, w);
+			check_link(i, ptr, m + 1, w);
+		}
+		i++;
+	}
+}
+
+int		find_solutions(t_lemin *ptr)
+{
+	int	i;
+	int	m;
+	t_ways *w;
+
+	m = 0;
+	i = 0;
+	ptr->solv = malloc(sizeof(t_ways));
+	ptr->solv->way = malloc(sizeof(t_hashmap));
+	ptr->solv->next = NULL;
+	w = ptr->solv;
+	while (i < ptr->count_r)
+	{
+		if (ptr->links[ptr->start][i] == 1 && (++m))
+		{
+			if (m != 1)
+			{
+				w->next = malloc(sizeof(t_ways));
+				w->next->way = malloc(sizeof(t_hashmap));
+				w->next->next = NULL;
+			}
+			ptr->links[ptr->start][i] = 2;
+			ptr->links[i][ptr->start] = 2;
+			mem_solv(i, ptr, 1, w);
+			check_link(i, ptr, 3, w);
+			if (m != 1)
+				w = w->next;
+		}
+		i++;
+	}
+	i = 0;
+	ptr->ways = 0;
+	while (i < ptr->count_r)
+		if (ptr->links[ptr->end][i++] != 0)
+			ptr->ways++;
+	ft_printf("ways = %d\n", ptr->ways);
+	while (ptr->solv)
+	{
+		while (ptr->solv->way)
+		{
+			ft_printf("%s -> ", ptr->solv->way->name);
+			ptr->solv->way = ptr->solv->way->next;
+		}
+		ft_printf("\n");
+		ptr->solv = ptr->solv->next;
+	}
+	return (ptr->ways);
+}
+
 int		main(void)
 {
 	t_lemin	*ptr;
