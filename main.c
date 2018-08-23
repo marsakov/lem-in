@@ -26,7 +26,23 @@ t_hashmap	*elembyi(t_lemin *ptr, int i)
 	return (NULL);
 }
 
-void	error(int e, char *line)
+int			coord_exist(t_lemin *ptr, t_hashmap	*current)
+{
+	int 		i;
+	t_hashmap	*tmp;
+
+	i = 0;
+	tmp = ptr->rooms;
+	while (i++ < current->i && tmp)
+	{
+		if (tmp->x == current->x && tmp->y == current->y)
+			return (1);
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
+void		error(int e, char *line)
 {
 	ft_printf(RED "%s [", "ERROR" NC);
 	if (e == 0)
@@ -45,10 +61,12 @@ void	error(int e, char *line)
 		ft_printf("%s]\n", "NO LINKS");
 	else if (e == 7)
 		ft_printf("%s]\n", "NO WAYS");
+	else if (e == 8)
+		ft_printf("%s : '%s']\n", "REPEAT COORD", line);
 	exit(1);
 }
 
-void	read_map(t_lemin *ptr)
+void		read_map(t_lemin *ptr)
 {
 	char *line;
 
@@ -81,7 +99,7 @@ void	read_map(t_lemin *ptr)
 	ft_printf(BLUE "END WRITTNG\n" NC);
 }
 
-int		main(void)
+int			main(void)
 {
 	t_lemin	*ptr;
 	char	*line;
@@ -114,11 +132,11 @@ int		main(void)
 	
 
 
-	for (int i = 0; i < ptr->count_r; i++)
-		ptr->links[i][ptr->start] = 0;
+	// for (int i = 0; i < ptr->count_r; i++)
+	// 	ptr->links[i][ptr->start] = 0;
 	if (!find_solutions(ptr))
 		error(7, NULL);
-
+	// mem_solv(ptr);
 	
 
 	/* ----------------------------------------- */

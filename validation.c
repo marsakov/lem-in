@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validation.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: msakovyc <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/08/21 21:20:32 by msakovyc          #+#    #+#             */
+/*   Updated: 2018/08/21 21:20:36 by msakovyc         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "lem-in.h"
 
@@ -61,6 +72,7 @@ void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 	tmp->name = ft_strncpy(tmp->name, line, i);
 	tmp->x = ft_atoi(ft_strchr(line, ' ') + 1);
 	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
+
 }
 
 void	write_elem(t_lemin *ptr, char *line)
@@ -77,18 +89,18 @@ void	write_elem(t_lemin *ptr, char *line)
 		tmp = tmp->next;
 	if (!(i = 0) && !ptr->count_r)
 	{
-		if (!(tmp = malloc(sizeof(t_hashmap))))
-			error(0, NULL);
+		!(tmp = malloc(sizeof(t_hashmap))) ? error(0, NULL) : 0;
 		ptr->rooms = tmp;
 	}
 	else
 	{
-		if (!(tmp->next = malloc(sizeof(t_hashmap))))
-			error(0, NULL);
+		!(tmp->next = malloc(sizeof(t_hashmap))) ? error(0, NULL) : 0;
 		tmp = tmp->next;
 	}
 	create_elem(ptr, tmp, line);
 	tmp->i = ptr->count_r;
+	if (coord_exist(ptr, tmp))
+		error(8, line);
 	ptr->count_r++;
 }
 
