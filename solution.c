@@ -12,6 +12,55 @@
 
 #include "lem-in.h"
 
+int		equal_ways(t_ways *way1, t_ways *way2)
+{
+	t_hashmap *tmp1;
+	t_hashmap *tmp2;
+
+	tmp1 = way1->way;
+	tmp2 = way2->way;
+	while (tmp1 && tmp2)
+	{
+		if (ft_strcmp(tmp1->name, tmp2->name))
+			return (0);
+		tmp1 = tmp1->next;
+		tmp2 = tmp2->next;
+	}
+	return (1);
+}
+
+void	del_double_ways(t_lemin *ptr)
+{
+	t_ways	*tmp1;
+	t_ways	*tmp2;
+	int		i;
+
+	tmp1 = ptr->solv;
+	while (tmp1)
+	{
+		tmp2 = ptr->solv;
+		while (tmp2->next)
+		{
+			if (tmp1->i != tmp2->next->i && tmp1->way->i == tmp2->next->way->i && equal_ways(tmp1, tmp2->next))
+			{
+				tmp2->next = tmp2->next->next;
+				ptr->ways--;
+			}
+			else
+				tmp2 = tmp2->next;
+		}
+		tmp1 = tmp1->next;
+	}
+	tmp1 = ptr->solv;
+	i = 0;
+	while (tmp1)
+	{
+		tmp1->i = i++;
+		tmp1 = tmp1->next;
+	}
+}
+
+
 t_hashmap	*mem_room(t_lemin *ptr, int row, int index)
 {
 	t_hashmap	*tmp;
@@ -26,7 +75,7 @@ t_hashmap	*mem_room(t_lemin *ptr, int row, int index)
 	return (way);
 }
 
-void		find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int index)
+void		find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int index, int **arr)
 {
 	int 		i;
 	t_hashmap	*way;
@@ -41,18 +90,18 @@ void		find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int index)
 	}
 	while (i < ptr->count_r)
 	{
-		if (ptr->links[row][i] == numb)
+		if (arr[row][i] == numb)
 		{
 			way = mem_room(ptr, row, index);
 			way->next = solv->way;
 			solv->way = way;
-			find_next(ptr, solv, numb - 1, i, index + 1);
+			find_next(ptr, solv, numb - 1, i, index + 1, arr);
 		}
 		i++;
 	}
 }
 
-void		mem_solv(t_lemin *ptr)
+void		mem_solv(t_lemin *ptr, int **arr)
 {
 	int 		i;
 	t_ways		*w;
@@ -62,7 +111,7 @@ void		mem_solv(t_lemin *ptr)
 	i = 0;
 	while (i < ptr->count_r)
 	{
-		if (ptr->links[ptr->end][i] != 0)
+		if (arr[ptr->end][i] != 0 && arr[ptr->end][i] != 1)
 		{
 			w = malloc(sizeof(t_ways));
 			w->i = ptr->ways++;
@@ -70,101 +119,115 @@ void		mem_solv(t_lemin *ptr)
 			w->way->next = NULL;
 			w->next = ptr->solv;
 			ptr->solv = w;
-			find_next(ptr, ptr->solv, ptr->links[ptr->end][i] - 1, i, 1);
+			find_next(ptr, ptr->solv, arr[ptr->end][i] - 1, i, 1, arr);
 		}
 		i++;
 	}
 }
 
-void	copy_arr(int **dst, int **src, int size)
+int		**copy_arr(int **src, int size)
 {
 	int i;
 	int j;
+	int **arr;
 
+	i = -1;
+	arr = ft_memalloc(sizeof(int**));
+	while (++i < size)
+		arr[i] = ft_memalloc(sizeof(int*) * size);
 	i = 0;
 	while (i < size)
 	{
 		j = 0;
 		while (j < size)
 		{
-			dst[i][j] = src[i][j];
+			arr[i][j] = src[i][j];
 			j++;
 		}
 		i++;
 	}
+	return (arr);
 }
 
-void	check_link(int k, t_lemin *ptr, int m)
+void	check_link(int k, t_lemin *ptr, int m, int **arr)
 {
 	int i;
+	int j;
+	int	**next_arr;
 
 	if (k == ptr->end)
+	{
+		/* ----------------------------------------- */
+		ft_printf("__________________________\n");
+		for (int a = 0; a < ptr->count_r; a++)
+		{
+			for (int b = 0; b < ptr->count_r; b++)
+				ft_printf("%d ", arr[a][b]);
+			ft_printf("\n");
+		}
+		ft_printf("__________________________\n");
+		/* ---------------------------------------- */
+		mem_solv(ptr, arr);
 		return ;
+	}
 	i = 0;
 	while (i < ptr->count_r)
 	{
-		if (ptr->links[k][i] == 1)
+		if (arr[k][i] == 1)
 		{
-			ptr->links[k][i] = m;
-			ptr->links[i][k] = m;
-			check_link(i, ptr, m + 1);
+			next_arr = copy_arr(arr, ptr->count_r);
+			next_arr[k][i] = m;
+			next_arr[i][k] = m;
+			check_link(i, ptr, m + 1, next_arr);
+
+			/* free array */
+			j = -1;
+			while (++j < ptr->count_r)
+				free(next_arr[j]);
+			free(next_arr);
+			/*  -------  */
+
 		}
 		i++;
-	}
-}
-
-void	del_wrong_ways(t_lemin *ptr)
-{
-	t_ways *tmp;
-	t_hashmap *start;
-
-	tmp = ptr->solv;
-	start = elembyi(ptr, ptr->start);
-	while (ft_strcmp(ptr->solv->name, start->name))
-		ptr->solv = ptr->solv->next;
-	while (tmp->next)
-	{
-		if (ft_strcmp(tmp->next->way->name, start->name))
-		{
-			tmp->next = tmp->next->next;
-		}
-		else
-			tmp = tmp->next;
 	}
 }
 
 int		find_solutions(t_lemin *ptr)
 {
 	int	i;
+	int j;
+	int **arr;
 
-	i = -1;
 	ptr->ways = 0;
-	ptr->copy_links = ft_memalloc(sizeof(int**));
-	while (++i < ptr->count_r)
-		ptr->copy_links[i] = ft_memalloc(sizeof(int*) * ptr->count_r);
-	copy_arr(ptr->copy_links, ptr->links, ptr->count_r);
 	i = 0;
 	while (i < ptr->count_r)
 	{
 		if (ptr->links[ptr->start][i] == 1)
 		{
-			ptr->links[ptr->start][i] = 2;
-			ptr->links[i][ptr->start] = 2;
-			check_link(i, ptr, 3);
-			mem_solv(ptr);
-			copy_arr(ptr->links, ptr->copy_links, ptr->count_r);
+			arr = copy_arr(ptr->links, ptr->count_r);
+			arr[ptr->start][i] = 2;
+			arr[i][ptr->start] = 2;
+			check_link(i, ptr, 3, arr);
+
+			/* free array */
+			j = -1;
+			while (++j < ptr->count_r)
+				free(arr[j]);
+			free(arr);
+			/*  -------  */
+
 		}
 		i++;
 	}
-	// mem_solv(ptr);
+	del_double_ways(ptr);
 
-	del_wrong_ways(ptr);
 	/* ------------------------------------------------*/
 	ft_printf("_________ mem solv ________\n");
 	t_ways *tmp = ptr->solv;
 	while (tmp)
 	{
 		t_hashmap *tmp_way = tmp->way;
+		ft_printf("index = %d | len = %d | ", tmp->i, tmp_way->i);
 		while (tmp_way)
 		{
 			ft_printf("-> %s ", tmp_way->name);

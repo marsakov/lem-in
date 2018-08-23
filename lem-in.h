@@ -42,7 +42,7 @@ typedef struct			s_lemin
 	int					count_r;
 	int					l;
 	int					**links;
-	int					**copy_links;
+	// int					**copy_links;
 	struct s_hashmap	*rooms;
 	int					ways;
 	struct s_ways		*solv;
@@ -57,11 +57,10 @@ void					create_elem(t_lemin *ptr, t_hashmap *tmp, char *line);
 void					write_elem(t_lemin *ptr, char *line);
 void					write_link(t_lemin *ptr, char *line);
 int						find_solutions(t_lemin *ptr);
-void					check_link(int k, t_lemin *ptr, int m);
+void					check_link(int k, t_lemin *ptr, int m, int **arr);
 t_hashmap				*mem_room(t_lemin *ptr, int row, int index);
-void					find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int index);
-void					mem_solv(t_lemin *ptr);
+void					find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int index, int **arr);
+void					mem_solv(t_lemin *ptr, int **arr);
 int						coord_exist(t_lemin *ptr, t_hashmap	*current);
-
 
 #endif
