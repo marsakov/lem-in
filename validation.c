@@ -40,7 +40,7 @@ int		is_valid(char *line, int bool)
 	return (1);
 }
 
-int		ibyname(t_lemin *ptr, char *name)
+int		ibyn(t_lemin *ptr, char *name)
 {
 	t_hashmap	*tmp;
 	int			c;
@@ -67,12 +67,11 @@ void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 		i++;
 	tmp->name = ft_memalloc(sizeof(char) * (i + 1));
 	tmp->next = NULL;
-	if (ibyname(ptr, line) != -1)
+	if (ibyn(ptr, line) != -1)
 		error(5, line);
 	tmp->name = ft_strncpy(tmp->name, line, i);
 	tmp->x = ft_atoi(ft_strchr(line, ' ') + 1);
 	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
-
 }
 
 void	write_elem(t_lemin *ptr, char *line)
@@ -104,30 +103,27 @@ void	write_elem(t_lemin *ptr, char *line)
 	ptr->count_r++;
 }
 
-void	write_link(t_lemin *ptr, char *line)
+void	write_link(t_lemin *p, char *line, int i)
 {
-	int i;
-
-	i = 0;
-	if (ptr->start == -1 || ptr->end == -1)
+	if (p->start == -1 || p->end == -1)
 		error(4, NULL);
-	ptr->links = malloc(sizeof(int*) * ptr->count_r);
-	while (i < ptr->count_r)
-		ptr->links[i++] = (int*)ft_memalloc(sizeof(int) * ptr->count_r);
-	if (ibyname(ptr, line) == -1 || ibyname(ptr, ft_strchr(line, '-') + 1) == -1)
+	p->links = malloc(sizeof(int*) * p->count_r);
+	while (i < p->count_r)
+		p->links[i++] = (int*)ft_memalloc(sizeof(int) * p->count_r);
+	if (ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1)
 		error(3, line);
-	ptr->links[ibyname(ptr, line)][ibyname(ptr, ft_strchr(line, '-') + 1)] = 1;
-	ptr->links[ibyname(ptr, ft_strchr(line, '-') + 1)][ibyname(ptr, line)] = 1;
+	p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
+	p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 	ft_printf("%s\n", line);
 	ft_strdel(&line);
 	while (GNL(0, &line) > 0)
 	{
 		if (ft_strchr(line, '-') && !ft_strchr(line, '#'))
 		{
-			if (ibyname(ptr, line) == -1 || ibyname(ptr, ft_strchr(line, '-') + 1) == -1)
+			if (ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1)
 				error(3, line);
-			ptr->links[ibyname(ptr, line)][ibyname(ptr, ft_strchr(line, '-') + 1)] = 1;
-			ptr->links[ibyname(ptr, ft_strchr(line, '-') + 1)][ibyname(ptr, line)] = 1;
+			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
+			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
 		ft_printf("%s\n", line);
 		ft_strdel(&line);
