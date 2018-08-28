@@ -124,8 +124,7 @@ int		find_ways(t_lemin *ptr)
 				free(arr[j]);
 			free(arr);
 		}
-	del_double_ways(ptr, 0);
-
+	sort_ways(ptr, -1);
 	/* ------------------------------------------------ */
 	ft_printf("_________ mem solv ________\n");
 	t_ways *tmp = ptr->solv;
@@ -142,7 +141,36 @@ int		find_ways(t_lemin *ptr)
 		tmp = tmp->next;
 	}
 	ft_printf("__________________________\n");
-	/* ------------------------------------------------ */
 	ft_printf("ways = %d\n", ptr->ways);
+	/* ------------------------------------------------ */
+
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	del_double_ways(ptr, 0);
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+	/* ------------------------------------------------ */
+	ft_printf("_________ sort solv ________\n");
+	t_ways *temp = ptr->solv;
+	while (temp)
+	{
+		t_hashmap *temp_way = temp->way;
+		ft_printf("index = %d | len = %d | ", temp->i, temp->len);
+		while (temp_way)
+		{
+			ft_printf("-> %s ", temp_way->name);
+			temp_way = temp_way->next;
+		}
+		ft_printf("\n");
+		temp = temp->next;
+	}
+	ft_printf("__________________________\n");
+	ft_printf("ways = %d\n", ptr->ways);
+	/* ------------------------------------------------ */
 	return (ptr->ways);
 }

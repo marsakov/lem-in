@@ -39,32 +39,130 @@ void	sort_ways(t_lemin *ptr, int j)
 	}
 }
 
-void	solution(t_lemin *ptr)
+void	print_step(t_lemin *ptr)
 {
-	sort_ways(ptr, -1);
-	/* ------------------------------------------------ 
-	ft_printf("_________ sort solv ________\n");
-	t_ways *tmp = ptr->solv;
+	int i;
+
+	i = -1;
+	while (++i < ptr->ants)
+	{
+		if (ptr->ant_in_end[i])
+		{
+			ft_printf("L%d-%s ", i + 1, elembyi(ptr, ptr->end)->name);
+			ptr->ant_in_end[i] = 0;
+		}
+	}
+	i = -1;
+	while (++i < ptr->count_r)
+		if (ptr->ant_in_room[i])
+			ft_printf("L%d-%s ", ptr->ant_in_room[i], elembyi(ptr, i)->name);
+	ft_printf("\n");
+}
+
+t_hashmap	*find_room(t_lemin *ptr, int index)
+{
+	t_ways		*tmp;
+	t_hashmap	*room;
+
+	tmp = ptr->solv;
 	while (tmp)
 	{
-		t_hashmap *tmp_way = tmp->way;
-		ft_printf("index = %d | len = %d | ", tmp->i, tmp->len);
-		while (tmp_way)
+		room = tmp->way;
+		while (room)
 		{
-			ft_printf("-> %s ", tmp_way->name);
-			tmp_way = tmp_way->next;
+			if (room->i == index)
+				return (room);
+			room = room->next;
 		}
-		ft_printf("\n");
 		tmp = tmp->next;
 	}
-	ft_printf("__________________________\n");
-	 ------------------------------------------------ */
-	ptr->full_empty = ft_memalloc(sizeof(int) * ptr->count_r);
-	while (ptr->ants)
-	{
-		while ()
-		{
+	return (0);
+}
 
+void	next_step(t_lemin *ptr)
+{
+	int			i;
+	t_hashmap	*room;
+
+	i = -1;
+	while (++i < ptr->count_r)
+	{
+		if (ptr->ant_in_room[i])
+		{
+			room = find_room(ptr, i)->next;
+			if (room && !ptr->ant_step[ptr->ant_in_room[i] - 1] && room->i == ptr->end)
+			{
+				ptr->ant_in_end[ptr->ant_in_room[i] - 1] = 1;
+				ptr->ant_step[ptr->ant_in_room[i] - 1] = 1;
+				ptr->ant_in_room[i] = 0;
+			}
+			else if (room && !ptr->ant_step[ptr->ant_in_room[i] - 1] && !ptr->ant_in_room[room->i])
+			{
+				ptr->ant_in_room[room->i] = ptr->ant_in_room[i];
+				ptr->ant_step[ptr->ant_in_room[i] - 1] = 1;
+				ptr->ant_in_room[i] = 0;
+			}
 		}
+	}
+}
+
+int		ants_not_in_end(t_lemin *ptr)
+{
+	int i;
+
+	i = -1;
+	while (++i < ptr->ants)
+	{
+		if (ptr->ant_in_end[i])
+			return (1);
+	}
+	i = -1;
+	while (++i < ptr->count_r)
+		if (ptr->ant_in_room[i])
+			return (1);
+	return (0);
+}
+
+void	solution(t_lemin *ptr)
+{
+	int			ant;
+	t_ways		*tmp;
+
+	ant = 1;
+	ptr->ant_in_room = ft_memalloc(sizeof(int) * ptr->count_r);
+	ptr->ant_in_end = ft_memalloc(sizeof(int) * ptr->ants);
+	ptr->ant_step = ft_memalloc(sizeof(int) * ptr->ants);
+	tmp = ptr->solv;
+	while (tmp)
+	{
+		free(tmp->way->name);
+		free(tmp->way);
+		tmp->way = tmp->way->next;
+		tmp = tmp->next;
+	}
+	while (ant <= ptr->ants)
+	{
+		ft_bzero(ptr->ant_step, sizeof(int) * ptr->ants);
+		next_step(ptr);
+		next_step(ptr);
+		tmp = ptr->solv;
+		while (tmp && ant <= ptr->ants)
+		{
+			if (tmp->way->i == ptr->end)
+			{
+				ptr->ant_in_end[ant - 1] = 1;
+				ant++;
+			}
+			else if (!ptr->ant_in_room[tmp->way->i])
+				ptr->ant_in_room[tmp->way->i] = ant++;
+			tmp = tmp->next;
+		}
+		print_step(ptr);
+	}
+	while (ants_not_in_end(ptr))
+	{
+		ft_bzero(ptr->ant_step, sizeof(int) * ptr->ants);
+		next_step(ptr);
+		print_step(ptr);
 	}
 }

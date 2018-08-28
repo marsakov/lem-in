@@ -44,19 +44,21 @@ typedef struct			s_lemin
 	int					l;
 	int					ways;
 	int					**links;
-	int					*full_empty;
+	int					*ant_in_room;
+	int					*ant_in_end;
+	int					*ant_step;
 	struct s_hashmap	*rooms;
 	struct s_ways		*solv;
 }						t_lemin;
 
-/* ------------- validation.c ------------- */
+/* ---------------- main.c ---------------- */
 t_hashmap				*elembyi(t_lemin *ptr, int i);
 int						coord_exist(t_lemin *ptr, t_hashmap	*current);
-void					error(int e, char *line);
-void					read_map(t_lemin *ptr);
-int						is_valid(char *line, int bool);
+int						error(int e, char *line);
+void					read_map(t_lemin *ptr, char *line);
 
-/* ---------------- main.c ---------------- */
+/* ------------- validation.c ------------- */
+int						is_valid(char *line, int bool);
 int						ibyn(t_lemin *ptr, char *name);
 void					create_elem(t_lemin *ptr, t_hashmap *tmp, char *line);
 void					write_elem(t_lemin *ptr, char *line);
@@ -71,11 +73,13 @@ int						find_ways(t_lemin *ptr);
 
 /* ------------- ways_help.c -------------- */
 void					free_way(t_ways *del);
+int						cross_ways(t_ways *way1, t_ways *way2);
 int						equal_ways(t_ways *way1, t_ways *way2);
 void					del_double_ways(t_lemin *ptr, int i);
 t_hashmap				*mem_room(t_lemin *ptr, int row);
 
 /* -------------- solution.c -------------- */
 void					solution(t_lemin *ptr);
+void					sort_ways(t_lemin *ptr, int j);
 
 #endif

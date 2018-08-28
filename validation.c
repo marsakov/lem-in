@@ -24,7 +24,7 @@ int		is_valid(char *line, int bool)
 	}
 	else
 	{
-		if (!(s = ft_strchr(line, ' ')) || !*(++s))
+		if (ft_strchr(line, 'L') || !(s = ft_strchr(line, ' ')) || !*(++s))
 			return (0);
 		while (*s && *s != ' ')
 			if (!ft_isdigit(*s++))
@@ -43,18 +43,25 @@ int		is_valid(char *line, int bool)
 int		ibyn(t_lemin *ptr, char *name)
 {
 	t_hashmap	*tmp;
+	char		*name2;
 	int			c;
 
 	c = 0;
 	while (name[c] && name[c] != '-' && name[c] != ' ')
 		c++;
+	name2 = ft_memalloc(sizeof(char) * c);
+	name2 = ft_strncpy(name2, name, c);
 	tmp = ptr->rooms;
 	while (tmp)
 	{
-		if (name && !ft_strncmp(tmp->name, name, c))
+		if (name2 && !ft_strcmp(tmp->name, name2))
+		{
+			free(name2);
 			return (tmp->i);
+		}
 		tmp = tmp->next;
 	}
+	free(name2);
 	return (-1);
 }
 
@@ -110,22 +117,19 @@ void	write_link(t_lemin *p, char *line, int i)
 	p->links = malloc(sizeof(int*) * p->count_r);
 	while (i < p->count_r)
 		p->links[i++] = (int*)ft_memalloc(sizeof(int) * p->count_r);
-	if (ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1)
-		error(3, line);
-	p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
-	p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
-	ft_printf("%s\n", line);
-	ft_strdel(&line);
-	while (GNL(0, &line) > 0)
+	while (line && *line)
 	{
 		if (ft_strchr(line, '-') && !ft_strchr(line, '#'))
 		{
 			if (ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1)
 				error(3, line);
+			if (ibyn(p, line) == ibyn(p, ft_strchr(line, '-') + 1))
+				error(9, line);
 			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
 		ft_printf("%s\n", line);
 		ft_strdel(&line);
+		GNL(0, &line);
 	}
 }

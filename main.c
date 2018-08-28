@@ -42,7 +42,7 @@ int			coord_exist(t_lemin *ptr, t_hashmap *current)
 	return (0);
 }
 
-void		error(int e, char *line)
+int		error(int e, char *line)
 {
 	ft_printf(RED "%s [", "ERROR" NC);
 	if (e == 0)
@@ -63,19 +63,24 @@ void		error(int e, char *line)
 		ft_printf("%s]\n", "NO WAYS");
 	else if (e == 8)
 		ft_printf("%s : '%s']\n", "REPEAT COORD", line);
+	else if (e == 9)
+		ft_printf("%s : '%s']\n", "INVALID LINK", line);
+	else if (e == 10)
+		ft_printf("%s : '%s']\n", "REPEAT '##start' or '##end'", line);
 	exit(1);
+	return (1);
 }
 
-void		read_map(t_lemin *ptr)
+void		read_map(t_lemin *ptr, char *line)
 {
-	char *line;
-
 	while (GNL(0, &line) > 0)
 	{
 		if (!ft_strcmp(line, "##start") || !ft_strcmp(line, "##end"))
 		{
-			!ft_strcmp(line, "##start") ? ptr->start = ptr->count_r : 0;
-			!ft_strcmp(line, "##end") ? ptr->end = ptr->count_r : 0;
+			if (!ft_strcmp(line, "##start"))
+				ptr->start == -1 ? ptr->start = ptr->count_r : error(10, line);
+			if (!ft_strcmp(line, "##end"))
+				ptr->end == -1 ? ptr->end = ptr->count_r : error(10, line);
 			ft_printf("%s\n", line);
 			ft_strdel(&line);
 			while (GNL(0, &line) > 0 && ft_strchr(line, '#') &&
@@ -107,21 +112,16 @@ int			main(void)
 	ptr->end = -1;
 	while (GNL(0, &line) > 0 && ft_printf("%s\n", line) &&
 		!(ptr->ants = ft_atoi(line)))
+	{
+		!ft_strchr(line, '#') ? error(1, line) : 0;
 		ft_strdel(&line);
-	if (!line || !is_valid(line, 0) || !ptr->ants)
+	}
+	if (!line || !is_valid(line, 0) || ft_strlen(line) > 9 || !ptr->ants)
 		error(1, line);
 	ft_strdel(&line);
-	read_map(ptr);
+	read_map(ptr, NULL);
 	if (ptr->l == 0)
 		error(6, NULL);
-	/* ------------------------------------------ 
-	for (int j = 0; j < ptr->count_r; j++)
-	{
-		for (int k = 0; k < ptr->count_r; k++)
-			ft_printf("%d ", ptr->links[j][k]);
-		ft_printf("\n");
-	}
-	 ------------------------------------------ */
 	if (!find_ways(ptr))
 		error(7, NULL);
 	solution(ptr);

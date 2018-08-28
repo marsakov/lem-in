@@ -23,11 +23,33 @@ void		free_way(t_ways *del)
 	free(del);
 }
 
+int			cross_ways(t_ways *way1, t_ways *way2)
+{
+	t_hashmap	*tmp1;
+	t_hashmap	*tmp2;
+
+	tmp1 = way1->way->next;
+	while (tmp1)
+	{
+		tmp2 = way2->way->next;
+		while (tmp2)
+		{
+			if (tmp1->next && tmp2->next && !ft_strcmp(tmp1->name, tmp2->name))
+				return (1);
+			tmp2 = tmp2->next;
+		}
+		tmp1 = tmp1->next;
+	}
+	return (0);
+}
+
 int			equal_ways(t_ways *way1, t_ways *way2)
 {
 	t_hashmap *tmp1;
 	t_hashmap *tmp2;
 
+	if (way1->len != way2->len)
+		return (0);
 	tmp1 = way1->way;
 	tmp2 = way2->way;
 	while (tmp1 && tmp2)
@@ -50,8 +72,8 @@ void		del_double_ways(t_lemin *ptr, int i)
 	{
 		tmp2 = ptr->solv;
 		while (tmp2->next)
-			if (tmp1->i != tmp2->next->i && tmp1->len == tmp2->next->len
-				&& equal_ways(tmp1, tmp2->next))
+			if (tmp1->i != tmp2->next->i && (equal_ways(tmp1, tmp2->next) ||
+				cross_ways(tmp1, tmp2->next)))
 			{
 				free_way(tmp2->next);
 				tmp2->next = tmp2->next->next;
