@@ -18,13 +18,14 @@ int		is_valid(char *line, int bool)
 
 	if (!bool)
 	{
+		(line[0] == '-' || line[0] == '+') ? line++ : 0;
 		while (*line)
 			if (!ft_isdigit(*line++))
 				return (0);
 	}
 	else
 	{
-		if (ft_strchr(line, 'L') || !(s = ft_strchr(line, ' ')) || !*(++s))
+		if (line[0] == 'L' || !(s = ft_strchr(line, ' ')) || !*(++s))
 			return (0);
 		while (*s && *s != ' ')
 			if (!ft_isdigit(*s++))
@@ -81,7 +82,7 @@ void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
 }
 
-void	write_elem(t_lemin *ptr, char *line)
+int		write_elem(t_lemin *ptr, char *line)
 {
 	int			i;
 	t_hashmap	*tmp;
@@ -105,9 +106,8 @@ void	write_elem(t_lemin *ptr, char *line)
 	}
 	create_elem(ptr, tmp, line);
 	tmp->i = ptr->count_r;
-	if (coord_exist(ptr, tmp))
-		error(8, line);
-	ptr->count_r++;
+	coord_exist(ptr, tmp) ? error(8, line) : 0;
+	return (++ptr->count_r);
 }
 
 void	write_link(t_lemin *p, char *line, int i)
@@ -119,9 +119,11 @@ void	write_link(t_lemin *p, char *line, int i)
 		p->links[i++] = (int*)ft_memalloc(sizeof(int) * p->count_r);
 	while (line && *line)
 	{
-		if (ft_strchr(line, '-') && !ft_strchr(line, '#'))
+		if (!ft_strchr(line, '#') && ft_strchr(line, '-'))
 		{
-			if (ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1)
+			if (line[0] == '-' || line[ft_strlen(line) - 1] == '-' ||
+				ft_strchr(line, '-') != ft_strrchr(line, '-') ||
+			(ibyn(p, line) == -1 || ibyn(p, ft_strchr(line, '-') + 1) == -1))
 				error(3, line);
 			if (ibyn(p, line) == ibyn(p, ft_strchr(line, '-') + 1))
 				error(9, line);
@@ -129,7 +131,8 @@ void	write_link(t_lemin *p, char *line, int i)
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
 		ft_printf("%s\n", line);
-		ft_strdel(&line);
-		GNL(0, &line);
+		free(line);
+		if (GNL(0, &line) < 1)
+			break ;
 	}
 }

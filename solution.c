@@ -12,7 +12,7 @@
 
 #include "lem-in.h"
 
-void	sort_ways(t_lemin *ptr, int j)
+void		sort_ways(t_lemin *ptr, int j)
 {
 	int			i;
 	int			tmp_len;
@@ -39,7 +39,7 @@ void	sort_ways(t_lemin *ptr, int j)
 	}
 }
 
-void	print_step(t_lemin *ptr)
+void		print_step(t_lemin *ptr)
 {
 	int i;
 
@@ -79,7 +79,7 @@ t_hashmap	*find_room(t_lemin *ptr, int index)
 	return (0);
 }
 
-void	next_step(t_lemin *ptr)
+void		next_step(t_lemin *ptr)
 {
 	int			i;
 	t_hashmap	*room;
@@ -106,7 +106,7 @@ void	next_step(t_lemin *ptr)
 	}
 }
 
-int		ants_not_in_end(t_lemin *ptr)
+int			ants_not_in_end(t_lemin *ptr)
 {
 	int i;
 
@@ -123,7 +123,7 @@ int		ants_not_in_end(t_lemin *ptr)
 	return (0);
 }
 
-void	solution(t_lemin *ptr)
+void		solution(t_lemin *ptr)
 {
 	int			ant;
 	t_ways		*tmp;
@@ -133,6 +133,7 @@ void	solution(t_lemin *ptr)
 	ptr->ant_in_end = ft_memalloc(sizeof(int) * ptr->ants);
 	ptr->ant_step = ft_memalloc(sizeof(int) * ptr->ants);
 	tmp = ptr->solv;
+	print_path(ptr);
 	while (tmp)
 	{
 		free(tmp->way->name);

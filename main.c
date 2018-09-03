@@ -73,7 +73,7 @@ int		error(int e, char *line)
 
 void		read_map(t_lemin *ptr, char *line)
 {
-	while (GNL(0, &line) > 0)
+	while (GNL(0, &line) > 0 && ft_strcmp(line, "END"))
 	{
 		if (!ft_strcmp(line, "##start") || !ft_strcmp(line, "##end"))
 		{
@@ -87,15 +87,15 @@ void		read_map(t_lemin *ptr, char *line)
 				ft_printf("%s\n", line))
 				ft_strdel(&line);
 			write_elem(ptr, line);
+			free(line);
 		}
-		else if (ft_strchr(line, '-') && !ft_strchr(line, '#') && ++ptr->l)
+		else if (ft_strchr(line, '-') && line[0] != '#' && ++ptr->l)
 			write_link(ptr, line, 0);
-		else if (!ft_strchr(line, '#'))
-			write_elem(ptr, line);
 		else
-			ft_printf("%s\n", line);
-		if (line && *line && !(ft_strchr(line, '-') && !ft_strchr(line, '#')))
-			ft_strdel(&line);
+		{
+			line[0] == '#' ? ft_printf("%s\n", line) : write_elem(ptr, line);
+			free(line);
+		}
 	}
 }
 
@@ -110,6 +110,9 @@ int			main(void)
 	ptr->count_r = 0;
 	ptr->start = -1;
 	ptr->end = -1;
+	ptr->all_path = 0;
+	ptr->true_path = 0;
+	ptr->solv = NULL;
 	while (GNL(0, &line) > 0 && ft_printf("%s\n", line) &&
 		!(ptr->ants = ft_atoi(line)))
 	{
@@ -125,6 +128,7 @@ int			main(void)
 	if (!find_ways(ptr))
 		error(7, NULL);
 	solution(ptr);
+	// system("leaks lem-in");
 	// while (1);
 	return (0);
 }

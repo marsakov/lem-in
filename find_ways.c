@@ -12,6 +12,30 @@
 
 #include "lem-in.h"
 
+void	print_path(t_lemin *ptr)
+{
+	/* ------------------------------------------------ */
+	ft_printf("___________ ways _________\n");
+	t_ways *tmp = ptr->solv;
+	while (tmp)
+	{
+		t_hashmap *tmp_way = tmp->way;
+		ft_printf("index = %d | len = %d | ", tmp->i, tmp->len);
+		while (tmp_way)
+		{
+			ft_printf("%s", tmp_way->name);
+			if (tmp_way->next)
+				ft_printf(" -> ");
+			tmp_way = tmp_way->next;
+		}
+		ft_printf("\n");
+		tmp = tmp->next;
+	}
+	ft_printf("__________________________\n");
+	ft_printf("ways = %d\n", ptr->ways);
+	/* ------------------------------------------------ */
+}
+
 void	find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int **arr)
 {
 	int			i;
@@ -47,7 +71,7 @@ void	mem_solv(t_lemin *ptr, int **arr)
 	while (++i < ptr->count_r)
 		if (arr[ptr->end][i] != 0 && arr[ptr->end][i] != 1)
 		{
-			w = malloc(sizeof(t_ways));
+			!(w = malloc(sizeof(t_ways))) ? error(0, NULL) : 0;
 			w->i = ptr->ways++;
 			w->len = 0;
 			w->way = mem_room(ptr, ptr->end);
@@ -65,9 +89,9 @@ int		**copy_arr(int **src, int size)
 	int **arr;
 
 	i = -1;
-	arr = ft_memalloc(sizeof(int**));
+	!(arr = ft_memalloc(sizeof(int*) * size)) ? error(0, NULL) : 0;
 	while (++i < size)
-		arr[i] = ft_memalloc(sizeof(int*) * size);
+		!(arr[i] = ft_memalloc(sizeof(int) * size)) ? error (0, NULL) : 0;
 	i = -1;
 	while (++i < size)
 	{
@@ -125,52 +149,10 @@ int		find_ways(t_lemin *ptr)
 			free(arr);
 		}
 	sort_ways(ptr, -1);
-	/* ------------------------------------------------ */
-	ft_printf("_________ mem solv ________\n");
-	t_ways *tmp = ptr->solv;
-	while (tmp)
-	{
-		t_hashmap *tmp_way = tmp->way;
-		ft_printf("index = %d | len = %d | ", tmp->i, tmp->len);
-		while (tmp_way)
-		{
-			ft_printf("-> %s ", tmp_way->name);
-			tmp_way = tmp_way->next;
-		}
-		ft_printf("\n");
-		tmp = tmp->next;
-	}
-	ft_printf("__________________________\n");
-	ft_printf("ways = %d\n", ptr->ways);
-	/* ------------------------------------------------ */
-
-
-
-
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if (ptr->all_path)
+		print_path(ptr);
 	del_double_ways(ptr, 0);
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-	/* ------------------------------------------------ */
-	ft_printf("_________ sort solv ________\n");
-	t_ways *temp = ptr->solv;
-	while (temp)
-	{
-		t_hashmap *temp_way = temp->way;
-		ft_printf("index = %d | len = %d | ", temp->i, temp->len);
-		while (temp_way)
-		{
-			ft_printf("-> %s ", temp_way->name);
-			temp_way = temp_way->next;
-		}
-		ft_printf("\n");
-		temp = temp->next;
-	}
-	ft_printf("__________________________\n");
-	ft_printf("ways = %d\n", ptr->ways);
-	/* ------------------------------------------------ */
+	if (ptr->true_path)
+		print_path(ptr);
 	return (ptr->ways);
 }
