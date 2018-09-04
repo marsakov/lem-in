@@ -16,27 +16,27 @@ int		is_valid(char *line, int bool)
 {
 	char *s;
 
+	s = NULL;
 	if (!bool)
 	{
-		(line[0] == '-' || line[0] == '+') ? line++ : 0;
+		(line[0] == '+') ? line++ : 0;
 		while (*line)
-			if (!ft_isdigit(*line++))
-				return (0);
+			(!ft_isdigit(*line++)) ? error(1, line) : 0;
 	}
 	else
 	{
 		if (line[0] == 'L' || !(s = ft_strchr(line, ' ')) || !*(++s))
-			return (0);
+			error(2, line);
+		while (line[bool - 1] && line[bool - 1] != *s)
+			(line[bool++ - 1] == '-') ? error(2, line) : 0;
+		(*s == '+' || *s == '-') ? s++ : 0;
 		while (*s && *s != ' ')
-			if (!ft_isdigit(*s++))
-				return (0);
-		if (!*(++s))
-			return (0);
+			(!ft_isdigit(*s++)) ? error(2, line) : 0;
+		(!*(++s)) ? error(2, line) : 0;
+		(*s == '+' || *s == '-') ? s++ : 0;
 		while (*s && *s != ' ')
-			if (!ft_isdigit(*s++))
-				return (0);
-		if (*s)
-			return (0);
+			(!ft_isdigit(*s++)) ? error(2, line) : 0;
+		(*s) ? error(2, line) : 0;
 	}
 	return (1);
 }
@@ -130,6 +130,8 @@ void	write_link(t_lemin *p, char *line, int i)
 			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
+		else if (!ft_strchr(line, '#'))
+			error(9, line);
 		ft_printf("%s\n", line);
 		free(line);
 		if (GNL(0, &line) < 1)

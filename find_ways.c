@@ -68,6 +68,11 @@ void	mem_solv(t_lemin *ptr, int **arr)
 	if (ptr->ways == 0)
 		ptr->solv = NULL;
 	i = -1;
+	if (ptr->ways > 5000)
+	{
+		sort_ways(ptr, -1);
+		del_double_ways(ptr, 0);
+	}
 	while (++i < ptr->count_r)
 		if (arr[ptr->end][i] != 0 && arr[ptr->end][i] != 1)
 		{
