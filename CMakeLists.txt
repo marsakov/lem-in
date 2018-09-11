@@ -1,7 +1,10 @@
-cmake_minimum_required(VERSION 3.9)
-project(lem_in)
+cmake_minimum_required(VERSION 3.12)
+project(lem_in C)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
+
+include_directories(.)
+include_directories(libft/includes)
 
 add_executable(lem_in
         libft/includes/libft.h

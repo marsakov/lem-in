@@ -10,77 +10,99 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lemin.h"
 
-int			free_way(t_ways *del)
+void		print_path(t_lemin *ptr)
 {
-	// ft_printf(RED "free_way : " NC);
-	if (!del)
-		return (0);
-	while (del->way)
+	t_ways		*tmp;
+	t_hashmap	*room;
+	int			i;
+
+	tmp = ptr->solv;
+	ft_printf("___________ ways _________\n");
+	while (tmp)
 	{
-		// ft_printf(YELLOW " |adr = %p| " NC, del->way->name);
-		// ft_printf(YELLOW " del->way->name |i = %d| " NC, del->way->i);
-		if (del->way->name)
-			// free(del->way->name);
-			ft_strdel(&(del->way->name));
-		// ft_printf(YELLOW " del->way\n" NC);
-		// if (del->way)
-		// 	free(del->way);
-		del->way = del->way->next;
+		i = 0;
+		ft_printf("index = %d | len = %d | ", tmp->i, tmp->len);
+		while (i < tmp->len)
+		{
+			room = elembyi(ptr, tmp->way[i]);
+			ft_printf("%s", room->name);
+			if (i != tmp->len - 1)
+				ft_printf(" -> ");
+			i++;
+		}
+		ft_printf("\n");
+		tmp = tmp->next;
 	}
-	if (del)
-		free(del);
-	// ft_printf(RED "END free_way\n" NC);
-	return (1);
+	ft_printf("__________________________\n");
+	ft_printf("ways = %d\n", ptr->ways);
+}
+
+void		sort_ways(t_lemin *ptr, int j)
+{
+	int			i;
+	int			tmp_len;
+	int			*tmp;
+	t_ways		*p;
+
+	while (++j < ptr->ways)
+	{
+		i = -1;
+		p = ptr->solv;
+		while (++i < ptr->ways - 1 && p && p->next)
+		{
+			if (p->len > p->next->len)
+			{
+				tmp = p->way;
+				tmp_len = p->len;
+				p->len = p->next->len;
+				p->way = p->next->way;
+				p->next->way = tmp;
+				p->next->len = tmp_len;
+			}
+			p = p->next;
+		}
+	}
 }
 
 int			cross_ways(t_ways *way1, t_ways *way2)
 {
-	t_hashmap	*tmp1;
-	t_hashmap	*tmp2;
+	int	i;
+	int	j;
 
-	// ft_printf(LGREEN "cross_ways : " NC);
-	tmp1 = way1->way->next;
-	while (tmp1)
+	i = 1;
+	if (!way1 || !way2)
+		return (1);
+	while (i < way1->len - 1)
 	{
-		tmp2 = way2->way->next;
-		while (tmp2 && tmp1->name && tmp2->name)
+		j = 1;
+		while (j < way2->len - 1)
 		{
-			if (tmp1->next && tmp2->next && !ft_strcmp(tmp1->name, tmp2->name))
-			{
-				// ft_printf(LBLUE "OK\n" NC);
+			if (way1->way[i] == way2->way[j])
 				return (1);
-			}
-			tmp2 = tmp2->next;
+			j++;
 		}
-		tmp1 = tmp1->next;
+		i++;
 	}
-	// ft_printf(LBLUE "OK\n" NC);
 	return (0);
 }
 
 int			equal_ways(t_ways *way1, t_ways *way2)
 {
-	t_hashmap *tmp1;
-	t_hashmap *tmp2;
+	int i;
 
+	i = 0;
 	if (!way1 || !way2)
 		return (0);
-	// ft_printf(LCYAN "equal_ways : " NC);
-	tmp1 = way1->way;
-	tmp2 = way2->way;
-	while (tmp1 && tmp2 && tmp1->name && tmp2->name)
+	if (way1->len != way2->len)
+		return (0);
+	while (i < way1->len)
 	{
-		if (ft_strcmp(tmp1->name, tmp2->name))
-		{
-			// ft_printf(LBLUE "OK\n" NC);
+		if (way1->way[i] != way2->way[i])
 			return (0);
-		}
-		tmp1 = tmp1->next;
-		tmp2 = tmp2->next;
+		i++;
 	}
-	// ft_printf(LBLUE "OK\n" NC);
 	return (1);
 }
 
@@ -88,7 +110,6 @@ void		del_double_ways(t_lemin *ptr, int i)
 {
 	t_ways	*tmp1;
 	t_ways	*tmp2;
-	t_ways	*leak;
 
 	tmp1 = ptr->solv;
 	while (tmp1)
@@ -96,12 +117,11 @@ void		del_double_ways(t_lemin *ptr, int i)
 		tmp2 = ptr->solv;
 		while (tmp2 && tmp2->next)
 			if (tmp1->i != tmp2->next->i && (equal_ways(tmp1, tmp2->next) ||
-						cross_ways(tmp1, tmp2->next)))
+						cross_ways(tmp1, tmp2->next)) && (ptr->ways--))
 			{
-				leak = tmp2->next;
+				free(tmp2->next->way);
+				free(tmp2->next);
 				tmp2->next = tmp2->next->next;
-				free_way(leak);
-				ptr->ways--;
 			}
 			else
 				tmp2 = tmp2->next;
@@ -113,21 +133,4 @@ void		del_double_ways(t_lemin *ptr, int i)
 		tmp1->i = i++;
 		tmp1 = tmp1->next;
 	}
-}
-
-t_hashmap	*mem_room(t_lemin *ptr, int row)
-{
-	t_hashmap	*tmp;
-	t_hashmap	*way;
-
-	tmp = elembyi(ptr, row);
-	if (!tmp)
-		return (NULL);
-	!(way = malloc(sizeof(t_hashmap))) ? error(1, NULL) : 0;
-	way->i = tmp->i;
-	way->name = ft_strdup(tmp->name);
-	way->x = tmp->x;
-	way->y = tmp->y;
-    way->next = NULL;
-	return (way);
 }

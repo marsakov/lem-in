@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lemin.h"
 
 int		is_valid(char *line, int bool)
 {
@@ -80,6 +80,7 @@ void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 	tmp->name = ft_strncpy(tmp->name, line, i);
 	tmp->x = ft_atoi(ft_strchr(line, ' ') + 1);
 	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
+	tmp->ant = 0;
 }
 
 int		write_elem(t_lemin *ptr, char *line)

@@ -10,80 +10,52 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lemin.h"
 
-void	print_path(t_lemin *ptr)
+void	find_next(t_lemin *ptr, int numb, int row, int **arr)
 {
-	/* ------------------------------------------------ */
-	ft_printf("___________ ways _________\n");
-	t_ways *tmp = ptr->solv;
-	while (tmp)
-	{
-		t_hashmap *tmp_way = tmp->way;
-		ft_printf("index = %d | len = %d | ", tmp->i, tmp->len);
-		while (tmp_way)
-		{
-			ft_printf("%s", tmp_way->name);
-			if (tmp_way->next)
-				ft_printf(" -> ");
-			tmp_way = tmp_way->next;
-		}
-		ft_printf("\n");
-		tmp = tmp->next;
-	}
-	ft_printf("__________________________\n");
-	ft_printf("ways = %d\n", ptr->ways);
-	/* ------------------------------------------------ */
-}
-
-void	find_next(t_lemin *ptr, t_ways *solv, int numb, int row, int **arr)
-{
-	int			i;
-	t_hashmap	*way;
+	int	i;
 
 	i = -1;
-	solv->len++;
 	if (row == ptr->start)
 	{
-		way = mem_room(ptr, row);
-		way->next = solv->way;
-		solv->way = way;
+		ptr->solv->way[0] = row;
 		return ;
 	}
 	while (++i < ptr->count_r)
 		if (arr[row][i] == numb)
 		{
-			way = mem_room(ptr, row);
-			way->next = solv->way;
-			solv->way = way;
-			find_next(ptr, solv, numb - 1, i, arr);
+			ptr->solv->way[ptr->solv->len - ++(ptr->solv->i)] = row;
+			find_next(ptr, numb - 1, i, arr);
 		}
 }
 
 void	mem_solv(t_lemin *ptr, int **arr)
 {
-	int			i;
-	t_ways		*w;
+	int		i;
+	t_ways	*w;
 
-	if (ptr->ways == 0)
-		ptr->solv = NULL;
-	i = -1;
 	if (ptr->ways > 5000)
 	{
 		sort_ways(ptr, -1);
 		del_double_ways(ptr, 0);
 	}
+	if (ptr->ways == 0)
+		ptr->solv = NULL;
+	i = -1;
 	while (++i < ptr->count_r)
 		if (arr[ptr->end][i] != 0 && arr[ptr->end][i] != 1)
 		{
 			!(w = malloc(sizeof(t_ways))) ? error(0, NULL) : 0;
-			w->i = ptr->ways++;
-			w->len = 0;
-			w->way = mem_room(ptr, ptr->end);
-			w->way->next = NULL;
+			if (!(w->way = malloc(sizeof(int) * arr[ptr->end][i])))
+				error(0, NULL);
+			w->i = 0;
+			w->len = arr[ptr->end][i];
+			w->way[w->len - ++(w->i)] = ptr->end;
 			w->next = ptr->solv;
 			ptr->solv = w;
-			find_next(ptr, ptr->solv, arr[ptr->end][i] - 1, i, arr);
+			find_next(ptr, arr[ptr->end][i] - 1, i, arr);
+			ptr->ways++;
 		}
 }
 
@@ -96,7 +68,7 @@ int		**copy_arr(int **src, int size)
 	i = -1;
 	!(arr = ft_memalloc(sizeof(int*) * size)) ? error(0, NULL) : 0;
 	while (++i < size)
-		!(arr[i] = ft_memalloc(sizeof(int) * size)) ? error (0, NULL) : 0;
+		!(arr[i] = ft_memalloc(sizeof(int) * size)) ? error(0, NULL) : 0;
 	i = -1;
 	while (++i < size)
 	{
@@ -109,10 +81,12 @@ int		**copy_arr(int **src, int size)
 
 void	check_link(int k, t_lemin *ptr, int m, int **arr)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 	int	**next_arr;
 
+	if (ptr->ways && m > ptr->ants && m > ptr->solv->len)
+		return ;
 	if (k == ptr->end)
 	{
 		mem_solv(ptr, arr);
@@ -135,11 +109,15 @@ void	check_link(int k, t_lemin *ptr, int m, int **arr)
 
 int		find_ways(t_lemin *ptr)
 {
-	int	i;
-	int	j;
-	int	**arr;
+	int		i;
+	int		j;
+	int		**arr;
+	t_ways	*w;
 
 	ptr->ways = 0;
+	i = -1;
+	while (++i < ptr->count_r)
+		ptr->links[i][ptr->start] = 0;
 	i = -1;
 	while (++i < ptr->count_r)
 		if (ptr->links[ptr->start][i] == 1)
@@ -153,11 +131,13 @@ int		find_ways(t_lemin *ptr)
 				free(arr[j]);
 			free(arr);
 		}
+	i = -1;
+	w = ptr->solv;
+	while (w && (w->i = i++) + 1)
+		w = w->next;
 	sort_ways(ptr, -1);
-	if (ptr->all_path)
-		print_path(ptr);
+	(ptr->all_path) ? print_path(ptr) : 0;
 	del_double_ways(ptr, 0);
-	if (ptr->true_path)
-		print_path(ptr);
+	(ptr->true_path) ? print_path(ptr) : 0;
 	return (ptr->ways);
 }

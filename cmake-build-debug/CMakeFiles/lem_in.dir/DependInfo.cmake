@@ -88,6 +88,8 @@ set(CMAKE_C_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
+  "../."
+  "../libft/includes"
   )
 
 # Targets to which this target links.

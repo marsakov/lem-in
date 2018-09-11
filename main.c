@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lemin.h"
 
 t_hashmap	*elembyi(t_lemin *ptr, int i)
 {
@@ -42,7 +42,7 @@ int			coord_exist(t_lemin *ptr, t_hashmap *current)
 	return (0);
 }
 
-int		error(int e, char *line)
+int			error(int e, char *line)
 {
 	ft_printf(RED "%s [", "ERROR" NC);
 	if (e == 0)
@@ -104,8 +104,7 @@ int			main(void)
 	t_lemin	*ptr;
 	char	*line;
 
-	if (!(ptr = malloc(sizeof(t_lemin))))
-		return (0);
+	(!(ptr = malloc(sizeof(t_lemin)))) ? error(0, NULL) : 0;
 	ptr->l = 0;
 	ptr->count_r = 0;
 	ptr->start = -1;
@@ -123,12 +122,8 @@ int			main(void)
 		error(1, line);
 	ft_strdel(&line);
 	read_map(ptr, NULL);
-	if (ptr->l == 0)
-		error(6, NULL);
-	if (!find_ways(ptr))
-		error(7, NULL);
-	solution(ptr);
-	// system("leaks lem-in");
-	// while (1);
+	(ptr->l == 0) ? error(6, NULL) : 0;
+	(!find_ways(ptr)) ? error(7, NULL) : 0;
+	solution(ptr, 1);
 	return (0);
 }
