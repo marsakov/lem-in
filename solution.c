@@ -12,7 +12,7 @@
 
 #include "lemin.h"
 
-void		print_step(t_lemin *ptr)
+void		print_step(t_lemin *ptr, int startend)
 {
 	int			i;
 	t_hashmap	*room;
@@ -20,12 +20,17 @@ void		print_step(t_lemin *ptr)
 	i = -1;
 	while (++i < ptr->ants)
 	{
-		if (ptr->ant_in_end[i])
+		room = elembyi(ptr, ptr->end);
+		if (!startend && ptr->ant_in_end[i])
 		{
-			ft_printf("L%d-%s ", i + 1, elembyi(ptr, ptr->end)->name);
+			ft_printf("L%d-%s ", i + 1, room->name);
 			ptr->ant_in_end[i] = 0;
 		}
+		else if (startend)
+			ft_printf("L%d-%s ", i + 1, room->name);
 	}
+	if (startend)
+		return ;
 	room = ptr->rooms;
 	while (room)
 	{
@@ -127,6 +132,6 @@ void		solution(t_lemin *ptr, int ant)
 				room->ant = ant++;
 			tmp = tmp->next;
 		}
-		print_step(ptr);
+		print_step(ptr, 0);
 	}
 }

@@ -107,37 +107,32 @@ void	check_link(int k, t_lemin *ptr, int m, int **arr)
 		}
 }
 
-int		find_ways(t_lemin *ptr)
+int		find_ways(t_lemin *ptr, int ac, char **av)
 {
 	int		i;
-	int		j;
-	int		**arr;
 	t_ways	*w;
 
 	ptr->ways = 0;
+	if (ptr->links[ptr->end][ptr->start] == 1)
+	{
+		print_step(ptr, 0);
+		exit(1);
+	}
 	i = -1;
 	while (++i < ptr->count_r)
 		ptr->links[i][ptr->start] = 0;
-	i = -1;
-	while (++i < ptr->count_r)
-		if (ptr->links[ptr->start][i] == 1)
-		{
-			arr = copy_arr(ptr->links, ptr->count_r);
-			arr[ptr->start][i] = 2;
-			arr[i][ptr->start] = 2;
-			check_link(i, ptr, 3, arr);
-			j = -1;
-			while (++j < ptr->count_r)
-				free(arr[j]);
-			free(arr);
-		}
+	check_link(ptr->start, ptr, 2, ptr->links);
 	i = -1;
 	w = ptr->solv;
 	while (w && (w->i = i++) + 1)
 		w = w->next;
 	sort_ways(ptr, -1);
-	(ptr->all_path) ? print_path(ptr) : 0;
+	if ((ac - 1) && (!ft_strcmp(av[1], "-a") || !ft_strcmp(av[1], "-at")
+		|| !ft_strcmp(av[1], "-ta")))
+		print_path(ptr);
 	del_double_ways(ptr, 0);
-	(ptr->true_path) ? print_path(ptr) : 0;
+	if ((ac - 1) && (!ft_strcmp(av[1], "-t") || !ft_strcmp(av[1], "-at")
+		|| !ft_strcmp(av[1], "-ta")))
+		print_path(ptr);
 	return (ptr->ways);
 }

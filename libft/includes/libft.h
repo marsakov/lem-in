@@ -70,6 +70,7 @@ typedef struct		s_frmt
 
 int					get_next_line(const int fd, char **line);
 int					ft_atoi(const char *str);
+intmax_t			ft_atointmxt(const char *str);
 int					ft_atoi_ptr(const char *str, int *i);
 void				ft_bzero(void *s, size_t n);
 int					ft_isprint(int c);

@@ -44,8 +44,6 @@ typedef struct			s_lemin
 	int					count_r;
 	int					l;
 	int					ways;
-	int					all_path;
-	int					true_path;
 	int					**links;
 	int					*ant_in_end;
 	int					*ant_step;
@@ -77,7 +75,7 @@ void					find_next(t_lemin *ptr, int numb, int row, int **arr);
 void					mem_solv(t_lemin *ptr, int **arr);
 int						**copy_arr(int **src, int size);
 void					check_link(int k, t_lemin *ptr, int m, int **arr);
-int						find_ways(t_lemin *ptr);
+int						find_ways(t_lemin *ptr, int ac, char **av);
 
 /*
 ** ------------- ways_help.c -------------- **
@@ -92,7 +90,7 @@ void					del_double_ways(t_lemin *ptr, int i);
 ** -------------- solution.c -------------- **
 */
 void					solution(t_lemin *ptr, int ant);
-void					print_step(t_lemin *ptr);
+void					print_step(t_lemin *ptr, int startend);
 int						find_linked_room(t_lemin *ptr, int index);
 void					next_step(t_lemin *ptr);
 int						ants_not_in_end(t_lemin *ptr);

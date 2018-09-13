@@ -83,11 +83,6 @@ void		read_map(t_lemin *ptr, char *line)
 				ptr->end == -1 ? ptr->end = ptr->count_r : error(10, line);
 			ft_printf("%s\n", line);
 			ft_strdel(&line);
-			while (GNL(0, &line) > 0 && ft_strchr(line, '#') &&
-				ft_printf("%s\n", line))
-				ft_strdel(&line);
-			write_elem(ptr, line);
-			free(line);
 		}
 		else if (ft_strchr(line, '-') && line[0] != '#' && ++ptr->l)
 			write_link(ptr, line, 0);
@@ -99,31 +94,29 @@ void		read_map(t_lemin *ptr, char *line)
 	}
 }
 
-int			main(void)
+int			main(int ac, char **av)
 {
-	t_lemin	*ptr;
+	t_lemin	*p;
 	char	*line;
 
-	(!(ptr = malloc(sizeof(t_lemin)))) ? error(0, NULL) : 0;
-	ptr->l = 0;
-	ptr->count_r = 0;
-	ptr->start = -1;
-	ptr->end = -1;
-	ptr->all_path = 0;
-	ptr->true_path = 0;
-	ptr->solv = NULL;
+	(!(p = malloc(sizeof(t_lemin)))) ? error(0, NULL) : 0;
+	p->l = 0;
+	p->count_r = 0;
+	p->start = -1;
+	p->end = -1;
+	p->solv = NULL;
 	while (GNL(0, &line) > 0 && ft_printf("%s\n", line) &&
-		!(ptr->ants = ft_atoi(line)))
+		!(p->ants = ft_atoi(line)))
 	{
 		!ft_strchr(line, '#') ? error(1, line) : 0;
 		ft_strdel(&line);
 	}
-	if (!line || !is_valid(line, 0) || ft_strlen(line) > 9 || !ptr->ants)
+	if (!line || !is_valid(line, 0) || p->ants < 1)
 		error(1, line);
 	ft_strdel(&line);
-	read_map(ptr, NULL);
-	(ptr->l == 0) ? error(6, NULL) : 0;
-	(!find_ways(ptr)) ? error(7, NULL) : 0;
-	solution(ptr, 1);
+	read_map(p, NULL);
+	(p->l == 0) ? error(6, NULL) : 0;
+	(!find_ways(p, ac, av)) ? error(7, NULL) : 0;
+	solution(p, 1);
 	return (0);
 }

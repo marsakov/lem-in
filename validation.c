@@ -68,7 +68,8 @@ int		ibyn(t_lemin *ptr, char *name)
 
 void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 {
-	int i;
+	int			i;
+	intmax_t	check;
 
 	i = 0;
 	while (line[i] && line[i] != ' ')
@@ -78,8 +79,14 @@ void	create_elem(t_lemin *ptr, t_hashmap *tmp, char *line)
 	if (ibyn(ptr, line) != -1)
 		error(5, line);
 	tmp->name = ft_strncpy(tmp->name, line, i);
-	tmp->x = ft_atoi(ft_strchr(line, ' ') + 1);
-	tmp->y = ft_atoi(ft_strrchr(line, ' ') + 1);
+	check = ft_atointmxt(ft_strchr(line, ' ') + 1);
+	if (check > 2147483648 || check < -2147483647)
+		error(2, line);
+	tmp->x = (int)check;
+	check = ft_atointmxt(ft_strrchr(line, ' ') + 1);
+	if (check > 2147483648 || check < -2147483647)
+		error(2, line);
+	tmp->y = (int)check;
 	tmp->ant = 0;
 }
 
@@ -118,7 +125,7 @@ void	write_link(t_lemin *p, char *line, int i)
 	p->links = malloc(sizeof(int*) * p->count_r);
 	while (i < p->count_r)
 		p->links[i++] = (int*)ft_memalloc(sizeof(int) * p->count_r);
-	while (line && *line)
+	while (line)
 	{
 		if (!ft_strchr(line, '#') && ft_strchr(line, '-'))
 		{
@@ -131,7 +138,7 @@ void	write_link(t_lemin *p, char *line, int i)
 			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
-		else if (!ft_strchr(line, '#'))
+		else if (!ft_strlen(line) || !ft_strchr(line, '#'))
 			error(9, line);
 		ft_printf("%s\n", line);
 		free(line);
