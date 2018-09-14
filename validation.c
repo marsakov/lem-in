@@ -127,7 +127,7 @@ void	write_link(t_lemin *p, char *line, int i)
 		p->links[i++] = (int*)ft_memalloc(sizeof(int) * p->count_r);
 	while (line)
 	{
-		if (!ft_strchr(line, '#') && ft_strchr(line, '-'))
+		if (line[0] != '#' && ft_strchr(line, '-'))
 		{
 			if (line[0] == '-' || line[ft_strlen(line) - 1] == '-' ||
 				ft_strchr(line, '-') != ft_strrchr(line, '-') ||
@@ -138,7 +138,7 @@ void	write_link(t_lemin *p, char *line, int i)
 			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
-		else if (!ft_strlen(line) || !ft_strchr(line, '#'))
+		else if (!ft_strlen(line) || NE_VALID)
 			error(9, line);
 		ft_printf("%s\n", line);
 		free(line);

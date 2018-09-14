@@ -17,6 +17,8 @@
 # include "libft/includes/libft.h"
 
 # define GNL(fd, ln) get_next_line(fd, &line)
+# define ANT_STEP nxt_rm && !ptr->ant_step[rm->ant - 1]
+# define NE_VALID line[0] != '#' || !ft_strcmp(line, "##start") || !ft_strcmp(line, "##end")
 
 typedef struct			s_hashmap
 {
@@ -90,9 +92,15 @@ void					del_double_ways(t_lemin *ptr, int i);
 ** -------------- solution.c -------------- **
 */
 void					solution(t_lemin *ptr, int ant);
-void					print_step(t_lemin *ptr, int startend);
+void					print_step(t_lemin *ptr);
 int						find_linked_room(t_lemin *ptr, int index);
 void					next_step(t_lemin *ptr);
+
+/*
+** -------------- solv_help.c ------------- **
+*/
 int						ants_not_in_end(t_lemin *ptr);
+int						ants_steps(t_lemin *ptr);
+void					print_all_step(t_lemin *ptr);
 
 #endif

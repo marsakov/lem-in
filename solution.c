@@ -12,7 +12,7 @@
 
 #include "lemin.h"
 
-void		print_step(t_lemin *ptr, int startend)
+void		print_step(t_lemin *ptr)
 {
 	int			i;
 	t_hashmap	*room;
@@ -20,23 +20,20 @@ void		print_step(t_lemin *ptr, int startend)
 	i = -1;
 	while (++i < ptr->ants)
 	{
-		room = elembyi(ptr, ptr->end);
-		if (!startend && ptr->ant_in_end[i])
+		if (ptr->ant_in_end[i])
 		{
+			room = elembyi(ptr, ptr->end);
 			ft_printf("L%d-%s ", i + 1, room->name);
 			ptr->ant_in_end[i] = 0;
 		}
-		else if (startend)
+		else if (ptr->ant_step[i])
+		{
+			room = ptr->rooms;
+			while (room && room->ant != i + 1)
+				room = room->next;
 			ft_printf("L%d-%s ", i + 1, room->name);
-	}
-	if (startend)
-		return ;
-	room = ptr->rooms;
-	while (room)
-	{
-		if (room->ant)
-			ft_printf("L%d-%s ", room->ant, room->name);
-		room = room->next;
+			ptr->ant_step[i] = 0;
+		}
 	}
 	ft_printf("\n");
 }
@@ -66,48 +63,27 @@ void		next_step(t_lemin *ptr)
 	t_hashmap	*rm;
 	t_hashmap	*nxt_rm;
 
-	rm = ptr->rooms;
-	while (rm)
-	{
-		if (rm->ant)
+	while (ants_steps(ptr) && (rm = ptr->rooms))
+		while (rm)
 		{
-			nxt_rm = elembyi(ptr, find_linked_room(ptr, rm->i));
-			if (nxt_rm && nxt_rm->i == ptr->end && !ptr->ant_step[rm->ant - 1])
+			if (rm->ant)
 			{
-				ptr->ant_in_end[rm->ant - 1] = 1;
-				ptr->ant_step[rm->ant - 1] = 1;
-				rm->ant = 0;
+				nxt_rm = elembyi(ptr, find_linked_room(ptr, rm->i));
+				if (ANT_STEP && nxt_rm->i == ptr->end)
+				{
+					ptr->ant_in_end[rm->ant - 1] = 1;
+					ptr->ant_step[rm->ant - 1] = 1;
+					rm->ant = 0;
+				}
+				else if (ANT_STEP && !nxt_rm->ant)
+				{
+					nxt_rm->ant = rm->ant;
+					ptr->ant_step[rm->ant - 1] = 1;
+					rm->ant = 0;
+				}
 			}
-			else if (nxt_rm && !ptr->ant_step[rm->ant - 1] && !nxt_rm->ant)
-			{
-				nxt_rm->ant = rm->ant;
-				ptr->ant_step[rm->ant - 1] = 1;
-				rm->ant = 0;
-			}
+			rm = rm->next;
 		}
-		rm = rm->next;
-	}
-}
-
-int			ants_not_in_end(t_lemin *ptr)
-{
-	int			i;
-	t_hashmap	*room;
-
-	i = -1;
-	while (++i < ptr->ants)
-	{
-		if (ptr->ant_in_end[i])
-			return (1);
-	}
-	room = ptr->rooms;
-	while (room)
-	{
-		if (room->ant)
-			return (1);
-		room = room->next;
-	}
-	return (0);
 }
 
 void		solution(t_lemin *ptr, int ant)
@@ -121,17 +97,17 @@ void		solution(t_lemin *ptr, int ant)
 	{
 		ft_bzero(ptr->ant_step, sizeof(int) * ptr->ants);
 		next_step(ptr);
-		next_step(ptr);
 		tmp = ptr->solv;
 		while (ant <= ptr->ants && tmp)
 		{
 			room = elembyi(ptr, tmp->way[1]);
-			if (room->i == ptr->end)
-				ptr->ant_in_end[ant++ - 1] = 1;
-			else if (!room->ant)
+			if (room && !room->ant)
+			{
+				ptr->ant_step[ant - 1] = 1;
 				room->ant = ant++;
+			}
 			tmp = tmp->next;
 		}
-		print_step(ptr, 0);
+		print_step(ptr);
 	}
 }

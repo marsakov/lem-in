@@ -114,10 +114,7 @@ int		find_ways(t_lemin *ptr, int ac, char **av)
 
 	ptr->ways = 0;
 	if (ptr->links[ptr->end][ptr->start] == 1)
-	{
-		print_step(ptr, 0);
-		exit(1);
-	}
+		print_all_step(ptr);
 	i = -1;
 	while (++i < ptr->count_r)
 		ptr->links[i][ptr->start] = 0;

@@ -11,7 +11,7 @@
 #******************************************************************************#
 
 NAME = lem-in
-SRCS = main.c validation.c ways_help.c find_ways.c solution.c
+SRCS = main.c validation.c ways_help.c find_ways.c solution.c solv_help.c
 FLAGS = -Wall -Werror -Wextra
 # -g -fsanitize=address
 
