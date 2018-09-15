@@ -138,7 +138,7 @@ void	write_link(t_lemin *p, char *line, int i)
 			p->links[ibyn(p, line)][ibyn(p, ft_strchr(line, '-') + 1)] = 1;
 			p->links[ibyn(p, ft_strchr(line, '-') + 1)][ibyn(p, line)] = 1;
 		}
-		else if (!ft_strlen(line) || NE_VALID)
+		else if (!ft_strlen(line) || line[0] != '#' || NE_VALID)
 			error(9, line);
 		ft_printf("%s\n", line);
 		free(line);

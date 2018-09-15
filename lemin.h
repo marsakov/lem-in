@@ -18,7 +18,7 @@
 
 # define GNL(fd, ln) get_next_line(fd, &line)
 # define ANT_STEP nxt_rm && !ptr->ant_step[rm->ant - 1]
-# define NE_VALID line[0] != '#' || !ft_strcmp(line, "##start") || !ft_strcmp(line, "##end")
+# define NE_VALID !ft_strcmp(line, "##start") || !ft_strcmp(line, "##end")
 
 typedef struct			s_hashmap
 {

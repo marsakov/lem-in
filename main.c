@@ -108,7 +108,7 @@ int			main(int ac, char **av)
 	while (GNL(0, &line) > 0 && ft_printf("%s\n", line) &&
 		!(p->ants = ft_atoi(line)))
 	{
-		(NE_VALID) ? error(1, line) : 0;
+		(line[0] != '#' || NE_VALID) ? error(1, line) : 0;
 		ft_strdel(&line);
 	}
 	if (!line || !is_valid(line, 0) || p->ants < 1)
@@ -119,6 +119,6 @@ int			main(int ac, char **av)
 		error(6, NULL);
 	(!find_ways(p, ac, av)) ? error(7, NULL) : 0;
 	solution(p, 1);
-	// system();
+	system("leaks lem-in");
 	return (0);
 }
